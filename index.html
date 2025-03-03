@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        input, button { margin: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+
+    <h2>Upload a Document and Ask Questions</h2>
+
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload</button>
+
+    <br><br>
+    
+    <input type="text" id="question" placeholder="Ask a question">
+    <button onclick="askQuestion()">Ask</button>
+
+    <h3>Response:</h3>
+    <p id="response"></p>
+
+    <script>
+        function uploadFile() {
+            let fileInput = document.getElementById("fileInput").files[0];
+            let formData = new FormData();
+            formData.append("file", fileInput);
+
+            fetch("http://127.0.0.1:5000/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error("Error:", error));
+        }
+
+        function askQuestion() {
+    let question = document.getElementById("question").value;
+
+    fetch("http://127.0.0.1:5000/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: question })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById("response").innerText = "Error: " + data.error;
+        } else {
+            document.getElementById("response").innerText = data.answer;
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+    </script>
+
+</body>
+</html>
